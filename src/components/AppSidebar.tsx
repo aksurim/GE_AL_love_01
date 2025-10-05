@@ -31,11 +31,12 @@ const menuItems = [
   { title: "Clientes", url: "/customers", icon: Users },
   { title: "Formas de Pagamento", url: "/payment-methods", icon: CreditCard },
   { title: "Vendas", url: "/sales", icon: ShoppingCart },
-  { 
-    title: "Relatórios", 
+  {
+    title: "Relatórios",
     icon: FileText,
     subItems: [
       { title: "Vendas por Produto", url: "/reports/sales-by-product" },
+      { title: "Histórico de Vendas", url: "/reports/sales-history" },
       { title: "Balanço de Estoque", url: "/reports/stock-balance" },
     ]
   },
@@ -50,7 +51,7 @@ export function AppSidebar() {
         {/* Logo Adicionado com tamanho aumentado */}
         <div className="flex items-center justify-center p-4 border-b">
           <NavLink to="/">
-            <img src="/logo.svg" alt="Art Licor Logo" className="h-16 w-auto" />
+            <img src="/logo.png" alt="Art Licor Logo" className="h-16 w-auto" />
           </NavLink>
         </div>
 

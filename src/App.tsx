@@ -11,6 +11,8 @@ import PaymentMethods from "./pages/PaymentMethods";
 import Settings from "./pages/Settings";
 import StockEntry from "./pages/StockEntry";
 import Sales from "./pages/Sales";
+import SalesByProduct from "./pages/reports/SalesByProduct";
+import SalesHistory from "./pages/reports/SalesHistory";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -30,6 +32,8 @@ const App = () => (
             <Route path="/settings" element={<Settings />} />
             <Route path="/stock-entry" element={<StockEntry />} />
             <Route path="/sales" element={<Sales />} />
+            <Route path="/reports/sales-by-product" element={<SalesByProduct />} />
+            <Route path="/reports/sales-history" element={<SalesHistory />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
