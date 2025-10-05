@@ -2,111 +2,113 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* Paleta de Cores Art Licor - Implementação v1 */
 
 @layer base {
   :root {
-    --background: 210 40% 98%;
-    --foreground: 215 25% 15%;
+    /* Cores Base: Bege e Marrom */
+    --background: 48 33% 94%; /* #F5F5DC Bege Claro/Creme (um pouco mais dessaturado) */
+    --foreground: 21 47% 25%; /* #5C3A21 Marrom Escuro */
 
-    --card: 0 0% 100%;
-    --card-foreground: 215 25% 15%;
+    /* Cards e Popovers: Um tom mais claro que o fundo para se destacar */
+    --card: 48 33% 98%; /* Quase branco, derivado do bege */
+    --card-foreground: 21 47% 25%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 215 25% 15%;
+    --popover: 48 33% 98%;
+    --popover-foreground: 21 47% 25%;
 
-    --primary: 218 70% 25%;
-    --primary-foreground: 0 0% 100%;
+    /* Cor Primária: Laranja Queimado */
+    --primary: 22 81% 53%; /* #E86725 */
+    --primary-foreground: 0 0% 100%; /* Branco para contraste */
 
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 215 25% 15%;
+    /* Cores Secundárias e de Apoio */
+    --secondary: 22 81% 95%; /* Laranja bem claro */
+    --secondary-foreground: 22 81% 53%;
 
-    --muted: 210 40% 96%;
-    --muted-foreground: 215 15% 45%;
+    --muted: 48 33% 90%; /* Bege um pouco mais escuro */
+    --muted-foreground: 21 47% 45%; /* Marrom mais suave */
 
-    --accent: 210 40% 93%;
-    --accent-foreground: 215 25% 15%;
+    --accent: 22 81% 92%; /* Laranja mais claro ainda */
+    --accent-foreground: 22 81% 53%;
 
-    --success: 142 71% 45%;
+    /* Cores Semânticas */
+    --success: 122 39% 40%; /* #4CAF50 Verde Cacto (um pouco mais escuro para contraste) */
     --success-foreground: 0 0% 100%;
 
-    --warning: 38 92% 50%;
-    --warning-foreground: 0 0% 100%;
+    --warning: 38 92% 50%; /* Amarelo/Âmbar padrão */
+    --warning-foreground: 21 47% 25%;
 
-    --destructive: 0 72% 51%;
+    --destructive: 0 72% 51%; /* Vermelho padrão para erros */
     --destructive-foreground: 0 0% 100%;
 
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 218 70% 25%;
+    /* Bordas e Inputs */
+    --border: 48 33% 85%;
+    --input: 48 33% 85%;
+    --ring: 22 81% 53%; /* Laranja */
 
     --radius: 0.5rem;
 
-    --sidebar-background: 218 70% 25%;
-    --sidebar-foreground: 210 40% 95%;
-    --sidebar-primary: 218 70% 35%;
+    /* Barra Lateral com Identidade Forte */
+    --sidebar-background: 21 47% 25%; /* #5C3A21 Marrom Escuro */
+    --sidebar-foreground: 48 33% 85%;   /* Texto Bege */
+    --sidebar-primary: 22 81% 53%;      /* #E86725 Laranja para item ativo */
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 218 70% 30%;
+    --sidebar-accent: 21 47% 35%;       /* Marrom um pouco mais claro para hover */
     --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 218 70% 20%;
-    --sidebar-ring: 218 70% 45%;
-
-    --gradient-primary: linear-gradient(135deg, hsl(218 70% 25%), hsl(218 70% 35%));
-    --gradient-success: linear-gradient(135deg, hsl(142 71% 45%), hsl(142 71% 55%));
-    --gradient-warning: linear-gradient(135deg, hsl(38 92% 50%), hsl(38 92% 60%));
-    
-    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
-    
-    --transition-base: all 0.2s ease-in-out;
+    --sidebar-border: 21 47% 20%;
+    --sidebar-ring: 22 81% 53%;
   }
 
   .dark {
-    --background: 218 70% 10%;
-    --foreground: 210 40% 95%;
+    /* Cores Base: Marrom super escuro e Bege */
+    --background: 21 47% 10%;
+    --foreground: 48 33% 94%;
 
-    --card: 218 70% 15%;
-    --card-foreground: 210 40% 95%;
+    /* Cards e Popovers */
+    --card: 21 47% 15%;
+    --card-foreground: 48 33% 94%;
 
-    --popover: 218 70% 15%;
-    --popover-foreground: 210 40% 95%;
+    --popover: 21 47% 15%;
+    --popover-foreground: 48 33% 94%;
 
-    --primary: 218 70% 45%;
-    --primary-foreground: 0 0% 100%;
+    /* Cor Primária: Laranja mais brilhante para contraste */
+    --primary: 22 81% 60%;
+    --primary-foreground: 21 47% 10%;
 
-    --secondary: 218 70% 20%;
-    --secondary-foreground: 210 40% 95%;
+    /* Cores Secundárias e de Apoio */
+    --secondary: 22 81% 20%;
+    --secondary-foreground: 48 33% 94%;
 
-    --muted: 218 70% 20%;
-    --muted-foreground: 215 15% 65%;
+    --muted: 21 47% 20%;
+    --muted-foreground: 48 33% 70%;
 
-    --accent: 218 70% 25%;
-    --accent-foreground: 210 40% 95%;
+    --accent: 22 81% 25%;
+    --accent-foreground: 48 33% 94%;
 
-    --success: 142 71% 45%;
-    --success-foreground: 0 0% 100%;
+    /* Cores Semânticas */
+    --success: 122 39% 49%;
+    --success-foreground: 21 47% 10%;
 
     --warning: 38 92% 50%;
-    --warning-foreground: 0 0% 100%;
+    --warning-foreground: 21 47% 10%;
 
-    --destructive: 0 72% 51%;
-    --destructive-foreground: 0 0% 100%;
+    --destructive: 0 63% 47%;
+    --destructive-foreground: 48 33% 94%;
 
-    --border: 218 70% 20%;
-    --input: 218 70% 20%;
-    --ring: 218 70% 45%;
+    /* Bordas e Inputs */
+    --border: 21 47% 20%;
+    --input: 21 47% 20%;
+    --ring: 22 81% 60%;
 
-    --sidebar-background: 218 70% 15%;
-    --sidebar-foreground: 210 40% 95%;
-    --sidebar-primary: 218 70% 25%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 218 70% 20%;
-    --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 218 70% 12%;
-    --sidebar-ring: 218 70% 45%;
+    /* Barra Lateral */
+    --sidebar-background: 21 47% 15%;
+    --sidebar-foreground: 48 33% 94%;
+    --sidebar-primary: 22 81% 60%;
+    --sidebar-primary-foreground: 21 47% 10%;
+    --sidebar-accent: 22 81% 20%;
+    --sidebar-accent-foreground: 48 33% 94%;
+    --sidebar-border: 21 47% 12%;
+    --sidebar-ring: 22 81% 60%;
   }
 }
 

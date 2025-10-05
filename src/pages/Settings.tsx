@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -10,42 +10,35 @@ import { Store } from "lucide-react";
 
 export default function Settings() {
   const queryClient = useQueryClient();
+  const [storeName, setStoreName] = useState("");
 
   const { data: storeConfig } = useQuery({
     queryKey: ["store-config"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("store_config")
-        .select("*")
-        .single();
-      if (error) throw error;
-      return data;
-    },
+    queryFn: async () => (await supabase.from("store_config").select("*").single()).data,
   });
 
-  const [storeName, setStoreName] = useState("");
+  useEffect(() => {
+    if (storeConfig) {
+      setStoreName(storeConfig.store_name);
+    }
+  }, [storeConfig]);
 
-  const updateMutation = useMutation({
+  const updateNameMutation = useMutation({
     mutationFn: async (name: string) => {
-      const { error } = await supabase
-        .from("store_config")
-        .update({ store_name: name })
-        .eq("id", storeConfig?.id);
+      const { error } = await supabase.from("store_config").update({ store_name: name }).eq("id", storeConfig?.id);
       if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["store-config"] });
       toast.success("Nome da loja atualizado com sucesso!");
     },
-    onError: () => {
-      toast.error("Erro ao atualizar nome da loja");
-    },
+    onError: (err: any) => toast.error(`Erro ao atualizar nome: ${err.message}`),
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleNameSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (storeName.trim()) {
-      updateMutation.mutate(storeName);
+      updateNameMutation.mutate(storeName);
     }
   };
 
@@ -55,27 +48,16 @@ export default function Settings() {
 
       <Card className="max-w-2xl">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Store className="h-5 w-5" />
-            Configurações da Loja
-          </CardTitle>
+          <CardTitle className="flex items-center gap-2"><Store className="h-5 w-5" />Configurações da Loja</CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleNameSubmit} className="space-y-4">
             <div>
               <Label htmlFor="store_name">Nome da Loja</Label>
-              <Input
-                id="store_name"
-                value={storeName || storeConfig?.store_name || ""}
-                onChange={(e) => setStoreName(e.target.value)}
-                placeholder="Art Licor"
-                required
-              />
-              <p className="text-sm text-muted-foreground mt-2">
-                Este nome aparecerá no dashboard e nos relatórios.
-              </p>
+              <Input id="store_name" value={storeName || ""} onChange={(e) => setStoreName(e.target.value)} placeholder="Art Licor" required />
+              <p className="text-sm text-muted-foreground mt-2">Este nome aparecerá no dashboard e nos relatórios.</p>
             </div>
-            <Button type="submit">Salvar Alterações</Button>
+            <Button type="submit" disabled={updateNameMutation.isLoading}>{updateNameMutation.isLoading ? 'Salvando...' : 'Salvar Alterações'}</Button>
           </form>
         </CardContent>
       </Card>
