@@ -22,7 +22,6 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-  useSidebar,
 } from "@/components/ui/sidebar";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
@@ -45,11 +44,16 @@ const menuItems = [
 ];
 
 export function AppSidebar() {
-  const { open } = useSidebar();
-
   return (
     <Sidebar collapsible="icon">
       <SidebarContent>
+        {/* Logo Adicionado com tamanho aumentado */}
+        <div className="flex items-center justify-center p-4 border-b">
+          <NavLink to="/">
+            <img src="/logo.svg" alt="Art Licor Logo" className="h-16 w-auto" />
+          </NavLink>
+        </div>
+
         <SidebarGroup>
           <SidebarGroupLabel>Menu Principal</SidebarGroupLabel>
           <SidebarGroupContent>

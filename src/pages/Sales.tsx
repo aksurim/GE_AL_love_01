@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Search, XCircle, ChevronsUpDown } from "lucide-react";
 import { toast } from "sonner";
 import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable'; // <-- CORREÇÃO: Importação direta
+import autoTable from 'jspdf-autotable';
 
 // --- Tipos de Dados ---
 interface Product { id: string; code: string; description: string; sale_price: number; stock_quantity: number; }
@@ -21,48 +21,72 @@ interface Customer { id: string; name: string; }
 interface PaymentMethod { id: string; description: string; }
 interface SaleItem extends Product { quantity: number; unit_price: number; subtotal: number; }
 
-// --- Função para Gerar o Recibo em PDF ---
-const generateReceiptPDF = (details: { saleId: string; items: SaleItem[]; totalAmount: number; paidAmount: number; changeAmount: number; customerName?: string | null; }) => {
+// --- Função para Gerar o Recibo em PDF (VERSÃO CENTRALIZADA) ---
+const generateReceiptPDF = (details: { saleCode: number; items: SaleItem[]; totalAmount: number; paidAmount: number; changeAmount: number; customerName?: string | null; }) => {
+  const { saleCode, items, totalAmount, paidAmount, changeAmount, customerName } = details;
+  
   const doc = new jsPDF();
-  const { saleId, items, totalAmount, paidAmount, changeAmount, customerName } = details;
+  const logoImg = new Image();
+  logoImg.src = '/logo.png';
 
-  // Cabeçalho
-  doc.setFontSize(20);
-  doc.text("Loja Vila do Artesão – ART LICOR", 14, 22);
-  doc.setFontSize(12);
-  doc.text(`Recibo da Venda: #${saleId}`, 14, 32);
-  doc.text(`Data: ${new Date().toLocaleString('pt-BR')}`, 14, 38);
-  if (customerName) {
-    doc.text(`Cliente: ${customerName}`, 14, 44);
-  }
+  logoImg.onload = async () => {
+    try {
+      const { data: storeConfig } = await supabase.from('store_config').select('store_name').single();
+      const storeName = storeConfig?.store_name || 'Sua Loja';
+      const formattedSaleCode = `ART-${String(saleCode).padStart(4, '0')}`;
+      const pageW = doc.internal.pageSize.getWidth();
 
-  // Tabela de Itens
-  const tableColumn = ["Produto", "Qtd.", "Preço Unit.", "Subtotal"];
-  const tableRows = items.map(item => [
-    item.description,
-    item.quantity,
-    item.unit_price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
-    item.subtotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
-  ]);
+      // 1. Centralizar o Logo
+      const logoW = 35;
+      const logoH = 26.25;
+      const logoX = (pageW - logoW) / 2;
+      doc.addImage(logoImg, 'PNG', logoX, 15, logoW, logoH);
 
-  // CORREÇÃO: Chamada direta da função autoTable
-  autoTable(doc, {
-    head: [tableColumn],
-    body: tableRows,
-    startY: customerName ? 50 : 44,
-  });
+      // 2. Centralizar o Título
+      doc.setFontSize(20);
+      doc.text(`${storeName} – ART LICOR`, pageW / 2, 50, { align: 'center' });
 
-  // Rodapé com Totais
-  const finalY = (doc as any).lastAutoTable.finalY;
-  doc.setFontSize(12);
-  doc.text(`Total: ${totalAmount.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}`, 14, finalY + 10);
-  doc.text(`Valor Pago: ${paidAmount.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}`, 14, finalY + 17);
-  doc.text(`Troco: ${changeAmount.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}`, 14, finalY + 24);
+      // 3. Informações da Venda (abaixo do título)
+      doc.setFontSize(12);
+      doc.text(`Recibo da Venda: ${formattedSaleCode}`, 14, 65);
+      doc.text(`Data: ${new Date().toLocaleString('pt-BR')}`, 14, 71);
+      if (customerName) {
+        doc.text(`Cliente: ${customerName}`, 14, 77);
+      }
 
-  doc.save(`Recibo-Venda-${saleId}.pdf`);
+      // 4. Tabela de Itens
+      autoTable(doc, {
+        head: [["Produto", "Qtd.", "Preço Unit.", "Subtotal"]],
+        body: items.map(item => [
+          item.description,
+          item.quantity,
+          item.unit_price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
+          item.subtotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+        ]),
+        startY: customerName ? 83 : 77,
+      });
+
+      // 5. Rodapé com Totais
+      const finalY = (doc as any).lastAutoTable.finalY;
+      doc.setFontSize(12);
+      doc.text(`Total: ${totalAmount.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}`, 14, finalY + 10);
+      doc.text(`Valor Pago: ${paidAmount.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}`, 14, finalY + 17);
+      doc.text(`Troco: ${changeAmount.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}`, 14, finalY + 24);
+
+      doc.save(`Recibo-Venda-${formattedSaleCode}.pdf`);
+    } catch (error: any) {
+      console.error("Erro ao montar o PDF:", error);
+      toast.error(`Falha ao processar dados para o recibo: ${error.message}`);
+    }
+  };
+
+  logoImg.onerror = () => {
+    toast.error("Falha ao carregar a imagem do logo para o recibo. Verifique se o arquivo 'logo.png' existe na pasta 'public'.");
+  };
 };
 
-// --- Componente de Input de Preço Inteligente ---
+
+// --- Componentes Auxiliares (PriceInput, ProductSearch, CheckoutModal) ---
 function PriceInput({ value, onChange }: { value: number; onChange: (newValue: number) => void }) {
   const [displayValue, setDisplayValue] = useState(value.toFixed(2).replace('.', ','));
   useEffect(() => { setDisplayValue(value.toFixed(2).replace('.', ',')); }, [value]);
@@ -78,7 +102,6 @@ function PriceInput({ value, onChange }: { value: number; onChange: (newValue: n
   return <Input type="text" value={displayValue} onChange={(e) => setDisplayValue(e.target.value)} onBlur={handleBlur} className="w-full text-right" />;
 }
 
-// --- Componente de Busca de Produto ---
 function ProductSearch({ onProductSelect }: { onProductSelect: (product: Product) => void }) {
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -107,7 +130,6 @@ function ProductSearch({ onProductSelect }: { onProductSelect: (product: Product
   );
 }
 
-// --- Componente do Modal de Checkout ---
 function CheckoutModal({ isOpen, onClose, totalAmount, saleItems, onConfirm, isPending }: { isOpen: boolean; onClose: () => void; totalAmount: number; saleItems: SaleItem[]; onConfirm: (details: any) => void; isPending: boolean; }) {
   const [customerId, setCustomerId] = useState<string | null>(null);
   const [paymentMethodId, setPaymentMethodId] = useState<string | null>(null);
@@ -166,16 +188,18 @@ export default function Sales() {
       const { customerName, ...rpcParams } = params;
       const { data, error } = await supabase.rpc('handle_new_sale', rpcParams);
       if (error) throw error;
-      return { saleId: data, customerName, variables: params };
+      return { saleCode: data, customerName, variables: params };
     },
-    onSuccess: ({ saleId, customerName, variables }) => {
+    onSuccess: ({ saleCode, customerName, variables }) => {
       const soldItemsForReceipt = saleItems.map(item => ({ ...item }));
-      toast.success(`Venda #${saleId} realizada com sucesso!`, {
+      const formattedSaleCode = `ART-${String(saleCode).padStart(4, '0')}`;
+
+      toast.success(`Venda ${formattedSaleCode} realizada com sucesso!`, {
         duration: 10000,
         action: {
           label: "Gerar Recibo",
           onClick: () => generateReceiptPDF({
-            saleId,
+            saleCode,
             items: soldItemsForReceipt,
             totalAmount: variables.p_total_amount,
             paidAmount: variables.p_paid_amount,
